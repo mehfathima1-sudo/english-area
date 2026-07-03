@@ -1,0 +1,1671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Silly English Academy - Overlord Edition</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Grandstander:wght@100..900&family=Reenie+Beanie&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background: radial-gradient(circle, #fef08a 0%, #fef3c7 100%);
+            overflow-x: hidden;
+        }
+        h1, h2, h3, h4, .funny-title {
+            font-family: 'Grandstander', cursive;
+        }
+        .bouncy-card {
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
+        }
+        .bouncy-card:hover {
+            transform: translateY(-6px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+        /* Horizontal roadmap scroll bar custom style */
+        .roadmap-scroll::-webkit-scrollbar {
+            height: 10px;
+        }
+        .roadmap-scroll::-webkit-scrollbar-track {
+            background: rgba(253, 224, 71, 0.2);
+            border-radius: 10px;
+        }
+        .roadmap-scroll::-webkit-scrollbar-thumb {
+            background: #f59e0b;
+            border-radius: 10px;
+        }
+        .roadmap-scroll::-webkit-scrollbar-thumb:hover {
+            background: #d97706;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+        .animate-shake {
+            animation: shake 0.3s ease-in-out infinite;
+            animation-iteration-count: 2;
+        }
+        /* Custom signature font */
+        .signature-font {
+            font-family: 'Reenie Beanie', cursive;
+        }
+        /* Certificate Print Layout Styles */
+        @media print {
+            body {
+                background: white !important;
+                color: black !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .print-only {
+                display: block !important;
+            }
+            .certificate-card {
+                border: 4px double #d97706 !important;
+                box-shadow: none !important;
+                page-break-after: always;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen text-slate-800 flex flex-col items-center justify-between p-4 md:p-8">
+
+    <script>
+        /* SOUND SYNTHESIZER UTILITIES (Web Audio API) */
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playSound(type) {
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'click') {
+                    osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.1);
+                    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.1);
+                } else if (type === 'success') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(261.63, audioCtx.currentTime); // C4
+                    osc.frequency.setValueAtTime(329.63, audioCtx.currentTime + 0.1); // E4
+                    osc.frequency.setValueAtTime(392.00, audioCtx.currentTime + 0.2); // G4
+                    osc.frequency.setValueAtTime(523.25, audioCtx.currentTime + 0.3); // C5
+                    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.5);
+                } else if (type === 'fail') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+                    osc.frequency.linearRampToValueAtTime(80, audioCtx.currentTime + 0.4);
+                    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.45);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.45);
+                } else if (type === 'pop') {
+                    osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(900, audioCtx.currentTime + 0.15);
+                    gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.15);
+                } else if (type === 'fanfare') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+                    osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.15); // E5
+                    osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.3); // G5
+                    osc.frequency.setValueAtTime(1046.50, audioCtx.currentTime + 0.45); // C6
+                    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.8);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.8);
+                }
+            } catch (e) {
+                console.log("Audio context activation requested", e);
+            }
+        }
+
+        // TEXT TO SPEECH UTILITY
+        function speakWord(text) {
+            try {
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.cancel();
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.rate = 0.85; // Slightly slower for better clear pronunciation
+                    utterance.pitch = 1.1; // Fun student tone
+                    window.speechSynthesis.speak(utterance);
+                }
+            } catch (err) {
+                console.warn("Speech synthesis unavailable", err);
+            }
+        }
+    </script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'silly-english-academy';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "",
+            authDomain: "mock-auth-domain.firebaseapp.com",
+            projectId: "mock-project-id",
+            storageBucket: "mock-storage.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:1234:web:abcd"
+        };
+
+        window.useLocalFallback = (!firebaseConfig.apiKey || firebaseConfig.apiKey.trim() === "");
+
+        if (!window.useLocalFallback) {
+            try {
+                const app = initializeApp(firebaseConfig);
+                const db = getFirestore(app);
+                const auth = getAuth(app);
+
+                window.appId = appId;
+                window.db = db;
+                window.auth = auth;
+                window.collectionPath = `artifacts/${appId}/public/data/students`;
+                console.log("Silly Database Context online.");
+            } catch (err) {
+                console.warn("Database failed, falling back to Local Mode:", err);
+                window.useLocalFallback = true;
+            }
+        } else {
+            console.log("Offline Local Sandbox active.");
+        }
+    </script>
+
+    <!-- MAIN CONTEXT ROOT -->
+    <div class="w-full max-w-4xl bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl p-6 md:p-8 flex flex-col gap-6 border-4 border-amber-400">
+        
+        <!-- HEADER ROW WITH USER PROFILE DISPLAY -->
+        <div class="flex flex-wrap items-center justify-between gap-4 border-b-4 border-dashed border-amber-300 pb-5">
+            <div class="flex items-center gap-3">
+                <span class="text-4xl">🤪</span>
+                <div>
+                    <h1 class="text-3xl font-extrabold text-amber-600 leading-none">Silly English Academy</h1>
+                    <p class="text-xs font-semibold text-slate-500 mt-1">Transforming Potatoes into Vocabulary Overlords with Malayalam hints!</p>
+                </div>
+            </div>
+            
+            <!-- Student profile card widget -->
+            <div id="profile-indicator" class="hidden bg-amber-100 px-4 py-2 rounded-2xl flex items-center gap-3 border-2 border-amber-400">
+                <div class="text-2xl" id="student-avatar-display">🥔</div>
+                <div>
+                    <div class="text-xs text-amber-800 font-bold">Active Student</div>
+                    <div class="font-black text-sm" id="student-name-display">Loading...</div>
+                </div>
+                <button onclick="logoutStudent()" class="p-1 hover:bg-amber-200 rounded-full text-amber-700" title="Switch Student">
+                    <span class="material-icons text-base">swap_horiz</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Offline Mode Banner Notice -->
+        <div id="offline-banner" class="hidden bg-emerald-50 border-2 border-emerald-300 text-emerald-800 rounded-2xl p-3 text-center text-xs font-bold">
+            ⚡ Offline Local Sandbox Mode Active! Created profiles and scores are stored safely in memory.
+        </div>
+
+        <!-- LOGIN / STUDENT SELECT AREA -->
+        <div id="login-screen" class="flex flex-col gap-6 py-6 items-center">
+            <h2 class="text-2xl font-black text-center text-amber-700">Who is studying today?</h2>
+            
+            <div class="w-full max-w-md">
+                <!-- List of existing students in Firestore / Memory -->
+                <div class="mb-4">
+                    <label class="block text-sm font-bold text-slate-500 mb-2">Select Existing Profile:</label>
+                    <div id="students-list" class="flex flex-col gap-2 max-h-48 overflow-y-auto bg-amber-50 p-3 rounded-2xl border-2 border-amber-200">
+                        <div class="text-sm text-center text-slate-400 py-4">Checking database for students...</div>
+                    </div>
+                </div>
+
+                <div class="relative flex py-4 items-center">
+                    <div class="flex-grow border-t border-slate-300"></div>
+                    <span class="flex-shrink mx-4 text-slate-400 text-xs uppercase font-extrabold">Or Create New Student</span>
+                    <div class="flex-grow border-t border-slate-300"></div>
+                </div>
+
+                <!-- Create Profile Input Form -->
+                <div class="flex flex-col gap-4 bg-yellow-50 p-4 rounded-2xl border-2 border-dashed border-amber-300">
+                    <div>
+                        <label class="block text-xs font-black text-amber-700 mb-1">Pick a Funny Avatar:</label>
+                        <div class="flex justify-around py-2 bg-white rounded-xl border border-amber-200" id="avatar-selector">
+                            <button type="button" onclick="selectAvatar('🥔')" class="avatar-option text-3xl p-1 rounded-lg border-2 border-transparent bg-amber-100 hover:scale-110 transition">🥔</button>
+                            <button type="button" onclick="selectAvatar('🐵')" class="avatar-option text-3xl p-1 rounded-lg border-2 border-transparent hover:scale-110 transition">🐵</button>
+                            <button type="button" onclick="selectAvatar('🦄')" class="avatar-option text-3xl p-1 rounded-lg border-2 border-transparent hover:scale-110 transition">🦄</button>
+                            <button type="button" onclick="selectAvatar('👻')" class="avatar-option text-3xl p-1 rounded-lg border-2 border-transparent hover:scale-110 transition">👻</button>
+                            <button type="button" onclick="selectAvatar('🥦')" class="avatar-option text-3xl p-1 rounded-lg border-2 border-transparent hover:scale-110 transition">🥦</button>
+                            <button type="button" onclick="selectAvatar('🦖')" class="avatar-option text-3xl p-1 rounded-lg border-2 border-transparent hover:scale-110 transition">🦖</button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-black text-amber-700 mb-1">Your Name / Code Name:</label>
+                        <input type="text" id="new-student-name" placeholder="E.g., Shezna, SuperNoodle" class="w-full px-4 py-3 rounded-xl border-2 border-amber-200 focus:border-amber-400 focus:outline-none font-bold text-sm">
+                    </div>
+
+                    <button onclick="createAndLoginStudent()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-black py-3 rounded-xl shadow-lg hover:shadow-xl transition flex items-center justify-center gap-2">
+                        <span class="material-icons">person_add</span> Create & Start Learning!
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- CORE CLASSROOM ENGINE WORKSPACE -->
+        <div id="academy-workspace" class="hidden flex flex-col gap-6">
+            
+            <!-- LIVE REPORT CARD & SKILL BOARD -->
+            <div class="bg-indigo-50 border-4 border-indigo-200 p-5 rounded-2xl flex flex-col gap-4 relative">
+                <div class="flex items-center justify-between border-b-2 border-dashed border-indigo-200 pb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="text-3xl">📊</span>
+                        <div>
+                            <h3 class="text-lg font-black text-indigo-800 leading-tight">Student Skill & Stats Board</h3>
+                            <p class="text-xs text-indigo-600">Performance across all syllabus milestones</p>
+                        </div>
+                    </div>
+                    <span id="overall-rank-badge" class="bg-indigo-600 text-white text-xs font-black px-3 py-1 rounded-full uppercase">Silly Apprentice</span>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <!-- Dictation Skill -->
+                    <div class="bg-white p-3 rounded-xl border-2 border-indigo-100 flex flex-col gap-1 shadow-sm">
+                        <div class="flex justify-between text-xs font-bold text-indigo-700">
+                            <span>Scribble Power 📝</span>
+                            <span id="skill-dictation-percent">0%</span>
+                        </div>
+                        <div class="w-full bg-slate-100 h-3 rounded-full overflow-hidden mt-1">
+                            <div id="skill-dictation-bar" class="bg-amber-400 h-full w-0 transition-all duration-500"></div>
+                        </div>
+                        <span class="text-[10px] text-slate-500 font-bold" id="skill-dictation-title">Dictation mastery</span>
+                    </div>
+
+                    <!-- Meaning Skill -->
+                    <div class="bg-white p-3 rounded-xl border-2 border-indigo-100 flex flex-col gap-1 shadow-sm">
+                        <div class="flex justify-between text-xs font-bold text-indigo-700">
+                            <span>Semantic Sorcery 🧠</span>
+                            <span id="skill-meaning-percent">0%</span>
+                        </div>
+                        <div class="w-full bg-slate-100 h-3 rounded-full overflow-hidden mt-1">
+                            <div id="skill-meaning-bar" class="bg-emerald-400 h-full w-0 transition-all duration-500"></div>
+                        </div>
+                        <span class="text-[10px] text-slate-500 font-bold" id="skill-meaning-title">Malayalam translation mastery</span>
+                    </div>
+
+                    <!-- Oral Skill -->
+                    <div class="bg-white p-3 rounded-xl border-2 border-indigo-100 flex flex-col gap-1 shadow-sm">
+                        <div class="flex justify-between text-xs font-bold text-indigo-700">
+                            <span>Sonic Speed 🗣️</span>
+                            <span id="skill-oral-percent">0%</span>
+                        </div>
+                        <div class="w-full bg-slate-100 h-3 rounded-full overflow-hidden mt-1">
+                            <div id="skill-oral-bar" class="bg-rose-400 h-full w-0 transition-all duration-500"></div>
+                        </div>
+                        <span class="text-[10px] text-slate-500 font-bold" id="skill-oral-title">Oral spelling speed</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Road Map Section Selection Tree (Scrollable from Z to A) -->
+            <div class="flex flex-col gap-2">
+                <div class="flex justify-between items-center px-1">
+                    <span class="text-xs font-black text-slate-400 uppercase tracking-wider">Level Progression Roadmap (Scroll Z → A)</span>
+                    <span id="level-unlock-status" class="text-xs font-bold bg-amber-200 text-amber-800 px-2 py-0.5 rounded-full">Section Z</span>
+                </div>
+                <!-- Dynamic Horizontal scroll area of nodes Z to A -->
+                <div class="flex gap-3 overflow-x-auto pb-3 pt-1 px-1 roadmap-scroll" id="roadmap-nodes">
+                    <!-- Loaded dynamically in JavaScript -->
+                </div>
+            </div>
+
+            <!-- Test Stage Navigation Tabs -->
+            <div class="flex flex-col gap-3">
+                <div class="grid grid-cols-4 gap-1 sm:gap-2">
+                    <button class="test-tab-btn px-2 py-3 bg-slate-100 hover:bg-amber-100 text-slate-600 font-bold text-xs rounded-xl border-2 border-transparent transition" onclick="switchTestStage(0)">
+                        <div class="text-lg">📖</div> Study Story
+                    </button>
+                    <button class="test-tab-btn px-2 py-3 bg-slate-100 hover:bg-amber-100 text-slate-600 font-bold text-xs rounded-xl border-2 border-transparent transition" onclick="switchTestStage(1)">
+                        <div class="text-lg">📝</div> Dictation
+                    </button>
+                    <button class="test-tab-btn px-2 py-3 bg-slate-100 hover:bg-amber-100 text-slate-600 font-bold text-xs rounded-xl border-2 border-transparent transition" onclick="switchTestStage(2)">
+                        <div class="text-lg">🧠</div> Meaning
+                    </button>
+                    <button class="test-tab-btn px-2 py-3 bg-slate-100 hover:bg-amber-100 text-slate-600 font-bold text-xs rounded-xl border-2 border-transparent transition" onclick="switchTestStage(3)">
+                        <div class="text-lg">🗣️</div> Oral Spells
+                    </button>
+                </div>
+                
+                <!-- Display Test Description & Humorous Meta Info -->
+                <div class="bg-gradient-to-r from-amber-500 to-amber-600 text-white p-4 rounded-2xl flex items-start gap-3 shadow-md relative overflow-hidden">
+                    <div class="text-3xl" id="test-stage-icon">💡</div>
+                    <div class="flex-grow">
+                        <h3 class="font-extrabold text-base md:text-lg" id="test-stage-title">Test Name Loading...</h3>
+                        <p class="text-xs text-amber-50 opacity-90 leading-relaxed mt-0.5" id="test-stage-desc">Instructions Loading...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STUDY AREA (Tab 0) -->
+            <div id="study-area-box" class="hidden bg-amber-50 border-4 border-amber-300 p-5 rounded-3xl flex flex-col gap-4 relative">
+                <div class="flex items-center gap-2 border-b-2 border-dashed border-amber-200 pb-3">
+                    <span class="text-3xl">📖</span>
+                    <div>
+                        <h3 class="text-lg font-black text-amber-800">Magical Wacky Story Intro</h3>
+                        <p class="text-xs text-amber-600">Read this funny adventure carrying all Level vocabulary words! Click on words to hear pronunciation & see Malayalam keys!</p>
+                    </div>
+                </div>
+                <!-- Dynamic custom generated narrative -->
+                <div id="study-story-content" class="text-base font-medium leading-loose text-slate-700 bg-white p-4 md:p-6 rounded-2xl border border-amber-200 shadow-inner">
+                    <!-- Built dynamically in JS -->
+                </div>
+                <!-- Mini Malayalam Pronunciation Quick Guide -->
+                <div class="bg-yellow-100 border-2 border-amber-200 p-3 rounded-xl flex items-center gap-2.5 text-xs">
+                    <span class="material-icons text-amber-600">info</span>
+                    <span class="font-bold text-amber-900">Pro-Tip: Teach student to look at spelling and press speak on words. Practice before proceeding to tests!</span>
+                </div>
+            </div>
+
+            <!-- Interactive Utilities Area (e.g. Speed Timers) -->
+            <div id="interactive-utility-box" class="hidden bg-red-50 border-2 border-dashed border-red-200 p-4 rounded-2xl flex items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <span class="text-3xl">⏱️</span>
+                    <div>
+                        <div id="timer-title-box" class="text-xs font-black text-red-700 uppercase tracking-wide">Rapid Speed-Round Blast Timer</div>
+                        <div id="timer-sub-box" class="text-sm font-bold text-slate-600 mt-0.5">Perfect for fast, quick spelling drills!</div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div id="timer-display" class="text-2xl font-black text-red-600 bg-white px-4 py-2 rounded-xl shadow-inner border border-red-200">5s</div>
+                    <button id="timer-play-btn" onclick="triggerWackySpeedTimer()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl font-bold shadow text-sm transition">
+                        Start!
+                    </button>
+                </div>
+            </div>
+
+            <!-- Main Grid list of words to challenge -->
+            <div id="grading-grid-section" class="flex flex-col gap-3">
+                <div class="flex justify-between items-center px-1">
+                    <span class="text-xs font-black text-slate-400 uppercase tracking-wider">Vocabulary List Challenge</span>
+                    <button onclick="toggleCheatSheet()" class="text-xs font-bold text-slate-500 hover:text-amber-600 flex items-center gap-1 transition">
+                        <span class="material-icons text-sm">visibility</span> Show Malayalam Answer Key (Cheat Sheet!)
+                    </button>
+                </div>
+
+                <!-- Custom Cheatsheet Box with warnings -->
+                <div id="cheat-sheet-box" class="hidden bg-stone-900 text-stone-200 p-4 rounded-2xl flex flex-col gap-2 border-4 border-amber-400">
+                    <div class="flex items-center gap-2 text-amber-400 font-extrabold text-sm">
+                        <span class="material-icons">warning</span> TEACHER'S ONLY CHEAT SHEET KEY (മലയാളം അർത്ഥങ്ങൾ സഹിതം)
+                    </div>
+                    <p class="text-xs text-stone-400">If you are a student and you sneak a peek, a cute little kitten will cry absolute tears of soy-sauce! 😿</p>
+                    <div id="cheat-list" class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2 font-bold text-xs p-2 bg-stone-800 rounded-lg">
+                        <!-- Filled by JS -->
+                    </div>
+                </div>
+
+                <!-- Interactive Words Grading Layout Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="word-grading-grid">
+                    <!-- Loaded dynamically -->
+                </div>
+            </div>
+
+            <!-- Grade Calculation Footer panel -->
+            <div class="border-t-4 border-dashed border-slate-200 pt-5 flex flex-col gap-4">
+                <div class="flex flex-wrap items-center justify-between gap-4 bg-slate-50 p-4 rounded-2xl border-2 border-slate-100">
+                    <div>
+                        <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Calculated Performance Metrics</div>
+                        <div class="flex items-baseline gap-3 mt-1">
+                            <span class="text-2xl font-black text-slate-700" id="test-fraction-label">0 / 20 Correct</span>
+                            <span class="text-lg font-bold text-amber-600" id="level-percentage-label">Pass Threshold: 45%</span>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Level Status</div>
+                        <div class="text-lg font-black text-emerald-500 flex items-center gap-1 mt-1 justify-end" id="level-status-tag">
+                            <span class="material-icons">check_circle</span> Standard Met!
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Smart Progression Next Button -->
+                <div class="w-full">
+                    <button id="smart-next-btn" onclick="handleSmartNextStep()" class="w-full py-4 px-6 rounded-2xl font-black text-lg shadow-xl transition-all duration-300 flex items-center justify-center gap-2 transform active:scale-95">
+                        <span id="smart-next-icon" class="material-icons">double_arrow</span>
+                        <span id="smart-next-text">Next Step Loading...</span>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <button onclick="saveTestProgressToDb()" class="bg-amber-500 hover:bg-amber-600 text-white py-4 rounded-2xl font-black shadow-lg shadow-amber-500/20 transition flex items-center justify-center gap-2">
+                        <span class="material-icons">save</span> Save Progress & Score
+                    </button>
+                    <button id="level-up-btn" onclick="triggerLevelUnlockAttempt()" class="bg-emerald-500 hover:bg-emerald-600 text-white py-4 rounded-2xl font-black shadow-lg shadow-emerald-500/20 transition flex items-center justify-center gap-2">
+                        <span class="material-icons">keyboard_double_arrow_up</span> Attempt Level Up!
+                    </button>
+                </div>
+            </div>
+
+            <!-- GRADUATION CERTIFICATE CENTER -->
+            <div class="mt-6 border-t-4 border-indigo-200 pt-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-2">
+                        <span class="text-3xl">🎓</span>
+                        <div>
+                            <h3 class="text-lg font-black text-indigo-900">Graduation & Certificate Center</h3>
+                            <p class="text-xs text-indigo-600">Unlock, preview, and print formal student certificates verified by Instructor Fathima.</p>
+                        </div>
+                    </div>
+                    <button onclick="window.print()" class="no-print bg-indigo-600 hover:bg-indigo-700 text-white font-black px-4 py-2 rounded-xl text-xs flex items-center gap-1.5 shadow transition">
+                        <span class="material-icons text-sm">print</span> Print Certificates
+                    </button>
+                </div>
+
+                <!-- Dual Certificates Display Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    <!-- 1. CERTIFICATE OF ELIGIBILITY -->
+                    <div class="certificate-card relative bg-gradient-to-br from-amber-50 via-white to-orange-50 border-8 border-amber-600 rounded-3xl p-6 shadow-xl flex flex-col justify-between items-center text-center overflow-hidden min-h-[420px]">
+                        <!-- Elegant Corners -->
+                        <div class="absolute top-2 left-2 text-amber-600/30 text-xl font-black">★</div>
+                        <div class="absolute top-2 right-2 text-amber-600/30 text-xl font-black">★</div>
+                        <div class="absolute bottom-2 left-2 text-amber-600/30 text-xl font-black">★</div>
+                        <div class="absolute bottom-2 right-2 text-amber-600/30 text-xl font-black">★</div>
+                        
+                        <div class="w-full flex flex-col items-center">
+                            <span class="text-amber-600 uppercase tracking-widest text-[10px] font-black">Silly English Academy</span>
+                            <h4 class="text-xl font-black text-amber-800 leading-tight mt-1">Certificate of Eligibility</h4>
+                            <div class="h-1 w-20 bg-amber-400 mt-2 rounded-full"></div>
+                        </div>
+
+                        <div class="my-4">
+                            <p class="text-xs text-slate-500 italic">This is to proudly certify that</p>
+                            <h3 class="text-2xl font-black text-slate-800 mt-2" id="cert-eligibility-name">Student Name</h3>
+                            <p class="text-xs text-slate-600 max-w-sm mt-3 leading-relaxed">
+                                has exhibited legendary learning capability and vocabulary prowess, rising above the standard level of Potato-hood to earn formal qualification status.
+                            </p>
+                        </div>
+
+                        <div class="w-full bg-amber-100/60 p-3 rounded-xl border border-amber-200 flex items-center justify-center gap-2">
+                            <span class="text-2xl" id="cert-eligibility-avatar">🥔</span>
+                            <div class="text-left">
+                                <span class="text-[9px] uppercase font-bold text-amber-700 block">Silly Rank Attained</span>
+                                <span class="text-xs font-black text-amber-900" id="cert-eligibility-rank">Silly Apprentice</span>
+                            </div>
+                        </div>
+
+                        <!-- Footer Signatures -->
+                        <div class="w-full grid grid-cols-2 gap-4 mt-6 pt-4 border-t border-amber-200">
+                            <div class="flex flex-col items-center justify-end">
+                                <span class="text-[9px] text-slate-400 uppercase font-bold">Authorized Date</span>
+                                <span class="text-xs font-bold text-slate-700 mt-1" id="cert-eligibility-date">July 3, 2026</span>
+                            </div>
+                            <div class="flex flex-col items-center relative">
+                                <!-- Signed Area -->
+                                <div class="absolute bottom-5 signature-font text-3xl text-indigo-700 select-none pointer-events-none transform -rotate-6">Fathima</div>
+                                <div class="w-full border-b border-dashed border-slate-400 h-6"></div>
+                                <span class="text-[9px] text-slate-400 uppercase font-bold mt-1">Teacher Signature</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. CERTIFICATE OF SKILL PERFORMANCE -->
+                    <div class="certificate-card relative bg-gradient-to-br from-indigo-50 via-white to-blue-50 border-8 border-indigo-600 rounded-3xl p-6 shadow-xl flex flex-col justify-between items-center text-center overflow-hidden min-h-[420px]">
+                        <!-- Elegant Corners -->
+                        <div class="absolute top-2 left-2 text-indigo-600/30 text-xl font-black">🎓</div>
+                        <div class="absolute top-2 right-2 text-indigo-600/30 text-xl font-black">🎓</div>
+                        <div class="absolute bottom-2 left-2 text-indigo-600/30 text-xl font-black">🎓</div>
+                        <div class="absolute bottom-2 right-2 text-indigo-600/30 text-xl font-black">🎓</div>
+                        
+                        <div class="w-full flex flex-col items-center">
+                            <span class="text-indigo-600 uppercase tracking-widest text-[10px] font-black">Silly English Academy</span>
+                            <h4 class="text-xl font-black text-indigo-800 leading-tight mt-1">Skill Performance Transcript</h4>
+                            <div class="h-1 w-20 bg-indigo-400 mt-2 rounded-full"></div>
+                        </div>
+
+                        <div class="my-2 w-full">
+                            <p class="text-xs text-slate-500 italic">Academy Progress Record of</p>
+                            <h3 class="text-xl font-black text-slate-800 mt-1" id="cert-performance-name">Student Name</h3>
+                            
+                            <!-- Skill bars listed inside certificate -->
+                            <div class="flex flex-col gap-2 text-left max-w-sm mx-auto mt-4 bg-white/80 p-3 rounded-2xl border border-indigo-100">
+                                <div>
+                                    <div class="flex justify-between text-[10px] font-bold text-indigo-800">
+                                        <span>📝 Scribble Power (Dictation)</span>
+                                        <span id="cert-skill-dictation-val">0%</span>
+                                    </div>
+                                    <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden mt-0.5">
+                                        <div id="cert-skill-dictation-bar" class="bg-amber-400 h-full w-0 transition-all duration-500"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-[10px] font-bold text-indigo-800">
+                                        <span>🧠 Semantic Sorcery (Meaning)</span>
+                                        <span id="cert-skill-meaning-val">0%</span>
+                                    </div>
+                                    <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden mt-0.5">
+                                        <div id="cert-skill-meaning-bar" class="bg-emerald-400 h-full w-0 transition-all duration-500"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-[10px] font-bold text-indigo-800">
+                                        <span>🗣️ Sonic Speed (Oral spelling)</span>
+                                        <span id="cert-skill-oral-val">0%</span>
+                                    </div>
+                                    <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden mt-0.5">
+                                        <div id="cert-skill-oral-bar" class="bg-rose-400 h-full w-0 transition-all duration-500"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-xs text-indigo-950 font-semibold px-4 italic">
+                            Verified by Silly Instructor Fathima as an accurate reflection of English Overlord development.
+                        </div>
+
+                        <!-- Footer Signatures with Instructor Name Fathima and blank spacing -->
+                        <div class="w-full grid grid-cols-2 gap-4 mt-6 pt-4 border-t border-indigo-200">
+                            <div class="flex flex-col items-center justify-end">
+                                <span class="text-[9px] text-slate-400 uppercase font-bold">Authorized Teacher</span>
+                                <span class="text-xs font-black text-indigo-900 mt-1">Instructor Fathima</span>
+                            </div>
+                            <div class="flex flex-col items-center relative">
+                                <!-- Signed Area -->
+                                <div class="absolute bottom-5 signature-font text-3xl text-indigo-700 select-none pointer-events-none transform -rotate-6">Fathima</div>
+                                <div class="w-full border-b border-dashed border-slate-400 h-6"></div>
+                                <span class="text-[9px] text-slate-400 uppercase font-bold mt-1">Teacher Sign-off</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- FUN LEADERBOARD FOOTER -->
+    <div class="w-full max-w-4xl mt-6 bg-amber-500 text-white rounded-2xl p-4 shadow-xl flex flex-wrap items-center justify-between gap-4 border-2 border-amber-300 no-print">
+        <div class="flex items-center gap-2">
+            <span class="text-2xl">🏆</span>
+            <div>
+                <h3 class="font-extrabold text-sm">Classroom Leaderboard</h3>
+                <p class="text-xs text-amber-100">See who has reached the ultimate English Overlord state!</p>
+            </div>
+        </div>
+        <div id="academy-leaderboard" class="flex flex-wrap gap-2 text-xs">
+            <!-- Programmatically listed in real-time -->
+        </div>
+    </div>
+
+    <!-- PLAYFUL MODAL OVERLAYS -->
+    <div id="modal-container" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 no-print">
+        <div class="bg-white rounded-3xl border-4 border-amber-400 max-w-md w-full p-6 text-center shadow-2xl flex flex-col items-center gap-4">
+            <div id="modal-art" class="text-6xl animate-bounce">🦄</div>
+            <h2 id="custom-modal-title" class="text-2xl font-black text-amber-600">Perfect Job!</h2>
+            <p id="custom-modal-desc" class="text-sm font-semibold text-slate-500 leading-relaxed">You passed! Let's party!</p>
+            <button onclick="closeCustomModal()" class="bg-amber-500 hover:bg-amber-600 text-white font-black px-8 py-3 rounded-xl shadow-lg transition">
+                Super-Duper!
+            </button>
+        </div>
+    </div>
+
+    <!-- CURRICULUM CONFIGURATION ENGINE (Generates Z to A complete databases with Malayalam Script & Phonetics) -->
+    <script>
+        const alphabetArr = "ZYXWVUTSRQPONMLKJIHGFEDCBA".split("");
+        
+        const rawThematicWords = {
+            'Z': ["Cat", "Dog", "Sun", "Bed", "Cup", "Book", "Fish", "Tree", "Milk", "Hand", "Foot", "Door", "Food", "Home", "Walk", "Run", "Jump", "Play", "Stop", "Help"],
+            'Y': ["Water", "House", "Chair", "Green", "Happy", "Sleep", "Drink", "Write", "Clean", "Family", "Friend", "School", "Mother", "Father", "Morning", "Night", "Smile", "Angry", "Small", "Large"],
+            'X': ["Beautiful", "Kitchen", "Clothes", "Teacher", "Morning", "Evening", "Picture", "Listen", "Speak", "Choose", "Forget", "Remember", "Always", "Because", "Welcome", "Market", "Journey", "Weather", "Inside", "Outside"],
+            'W': ["Shadow", "Window", "Bridge", "Forest", "Valley", "Winter", "Summer", "Spring", "Autumn", "Flower", "Yellow", "Orange", "Purple", "Silver", "Golden", "Monkey", "Rabbit", "Kitten", "Turtle", "Spider"],
+            'V': ["Animal", "Bottle", "Camera", "Guitar", "Hammer", "Pencil", "Doctor", "Farmer", "Driver", "Artist", "Singer", "Player", "Friend", "Sister", "Brother", "Street", "Garden", "Market", "Corner", "Island"],
+            'U': ["Volcano", "Violin", "Vehicle", "Varnish", "Voucher", "Village", "Vintage", "Victory", "Vulture", "Visitor", "Variety", "Vanilla", "Vampire", "Vacancy", "Vibrant", "Valuable", "Velocity", "Vertical", "Vigilant", "Vigorous"],
+            'T': ["Tragedy", "Tornado", "Tonight", "Tourism", "Tracker", "Texture", "Triumph", "Tension", "Terminal", "Tactics", "Theatre", "Thermal", "Thought", "Through", "Tobacco", "Traffic", "Trillion", "Turbine", "Tympanum", "Typhoon"],
+            'S': ["Syllable", "Scenery", "Science", "Sausage", "Sculptor", "Segment", "Seminary", "Senator", "Sequence", "Servant", "Shelter", "Sheriff", "Sickness", "Silence", "Silicon", "Similar", "Sincere", "Sleekly", "Smuggler", "Software"],
+            'R': ["Radiator", "Rational", "Reaction", "Receiver", "Recovery", "Register", "Relation", "Relative", "Reporter", "Republic", "Research", "Resident", "Resource", "Response", "Revenge", "Rhetoric", "Rhythmic", "Riddance", "Roadster", "Rotation"],
+            'Q': ["Quadrant", "Quantity", "Quarrel", "Quartet", "Quenching", "Quiverly", "Quiescent", "Quotient", "Quizzical", "Quagmire", "Qualify", "Quality", "Quarrying", "Quarterly", "Quasars", "Queendom", "Querulous", "Querying", "Question", "Quickest"],
+            'P': ["Parallel", "Paramount", "Partition", "Passenger", "Pathology", "Patriotic", "Pavement", "Pedestrian", "Peninsula", "Perfection", "Permanent", "Persuade", "Pessimist", "Petroleum", "Pharmacist", "Phenomenon", "Philosophy", "Phonetics", "Physiology", "Pioneering"],
+            'O': ["Obstacle", "Occasion", "Octopus", "Offensive", "Official", "Omission", "Opponent", "Opposite", "Optimist", "Ordinary", "Organism", "Original", "Ornament", "Outburst", "Outcome", "Outdoors", "Overflow", "Overhead", "Overlook", "Overture"],
+            'N': ["Narrator", "National", "Navigate", "Nebulous", "Needless", "Negation", "Neighbor", "Neonatal", "Nervous", "Network", "Neutral", "Newcomer", "Nicotine", "Nocturnal", "Nominate", "Nonsense", "Northern", "Notebook", "Novelty", "Nuance"],
+            'M': ["Magnitude", "Majority", "Mammoth", "Mandatory", "Manifesto", "Manpower", "Marginal", "Masculine", "Massive", "Mastery", "Material", "Maternal", "Mathematics", "Matrimony", "Maximum", "Meadow", "Meantime", "Mechanic", "Medieval", "Melody"],
+            'L': ["Laboratory", "Labyrinth", "Lamentation", "Landscape", "Landslide", "Latitude", "Laudable", "Laughter", "Lawmaker", "Leadership", "Learning", "Lecturer", "Legacy", "Legalize", "Legendary", "Legislate", "Legitimate", "Leisure", "Lethargic", "Liability"],
+            'K': ["Kaleidoscope", "Keepsake", "Keratin", "Keyboard", "Kidnapping", "Kindliness", "Kindred", "Kinetic", "Kingdom", "Kinsman", "Kitchenette", "Knapsack", "Knavery", "Kneading", "Knighthood", "Knitwear", "Knockout", "Knowledgeable", "Knuckle", "Krypton"],
+            'J': ["Jamboree", "Janitor", "Jargoning", "Jaundiced", "Jauntily", "Jealousy", "Jeopardy", "Jeweler", "Jockeying", "Jocundly", "Journalist", "Journeying", "Joviality", "Joyfulness", "Jubilant", "Judicial", "Jugglery", "Junction", "Jurisdiction", "Justified"],
+            'I': ["Identity", "Ideology", "Idiomatic", "Ignorance", "Illusion", "Illustrate", "Imaginary", "Imitate", "Immediate", "Imminent", "Immunity", "Impacted", "Impatient", "Imperial", "Implement", "Implicit", "Important", "Impose", "Impossible", "Impression"],
+            'H': ["Habitation", "Haggardly", "Hairdresser", "Hallucinate", "Handicapped", "Haphazard", "Harassment", "Harbinger", "Harmonious", "Harsher", "Harvesting", "Hatching", "Haughtiness", "Hazardous", "Headquarters", "Heartfelt", "Heavily", "Hereditary", "Hesitation", "Hierarchy"],
+            'G': ["Generosity", "Geographical", "Germination", "Gesticulate", "Ghostwriter", "Giantess", "Giddiness", "Gigabyte", "Giggle", "Gladiator", "Glamorous", "Gleaming", "Glimmering", "Globalization", "Glorious", "Glossary", "Glowworm", "Gluttony", "Gondolier", "Government"],
+            'F': ["Fabrication", "Fabulous", "Facilitate", "Factfinding", "Fadedly", "Failure", "Faithful", "Falconer", "Fallacy", "Familiarity", "Fanaticism", "Fanciful", "Fantasia", "Farfetched", "Fascinating", "Fatalism", "Fatherhood", "Favorable", "Fearfulness", "Feasibility"],
+            'E': ["Earthquake", "Eccentric", "Echoing", "Eclipse", "Ecology", "Economic", "Ecstatically", "Edible", "Editorial", "Educational", "Effective", "Efficiency", "Effortless", "Eggshell", "Egotistical", "Elaborate", "Elasticity", "Elderly", "Electoral", "Electricity"],
+            'D': ["Dandelion", "Daringly", "Darkness", "Dashboard", "Database", "Daydreamer", "Deadlock", "Deafening", "Debatable", "Decade", "Decapitate", "Deceitful", "Decentralize", "Deception", "Deceptive", "Decibel", "Decisive", "Declaration", "Decline", "Decoration"],
+            'C': ["Cabinets", "Cafeteria", "Calculated", "Calamitous", "Calibration", "Camouflage", "Campaigning", "Canalization", "Cancellation", "Candidacy", "Capitalization", "Captivity", "Caramelize", "Carbohydrate", "Cardiovascular", "Carelessness", "Caricature", "Carnivore", "Cartography", "Casualty"],
+            'B': ["Babyhood", "Baccalaureate", "Backbone", "Backgammon", "Background", "Backlash", "Backpacker", "Backward", "Bacterial", "Badminton", "Baggage", "Bailiff", "Balanced", "Balcony", "Balladry", "Ballet", "Ballistics", "Balloonist", "Bamboozle", "Banister"],
+            'A': ["Abandonment", "Abbreviation", "Abdominally", "Abduction", "Aberration", "Abhorrence", "Abide", "Abnormalities", "Abolitionist", "Abominable", "Aboriginal", "Abortive", "Abound", "Abrasiveness", "Abridgement", "Abruptly", "Absolution", "Absorbency", "Abstention", "Abstracted"]
+        };
+
+        const malayalamMeanings = {
+            // Level Z
+            "Cat": "പൂച്ച (Poocha)", "Dog": "നായ / പട്ടി (Naaya / Patti)", "Sun": "സൂര്യൻ (Sooryan)", "Bed": "കട്ടിൽ / കിടക്ക (Kattil / Kidakka)",
+            "Cup": "കപ്പ് (Cup)", "Book": "പുസ്തകം (Pusthakam)", "Fish": "മീൻ / മത്സ്യം (Meen / Matsyam)", "Tree": "മരം (Maram)",
+            "Milk": "പാൽ (Paal)", "Hand": "കൈ (Kai)", "Foot": "കാൽ (Kaal)", "Door": "വാതിൽ (Vaathil)",
+            "Food": "ഭക്ഷണം (Bhakshanam)", "Home": "വീട് (Veed)", "Walk": "നടക്കുക (Nadakkuka)", "Run": "ഓടുക (Oduka)",
+            "Jump": "ചാടുക (Chaaduka)", "Play": "കളിക്കുക (Kalikkuka)", "Stop": "നിർത്തുക (Nirthuka)", "Help": "സഹായിക്കുക (Sahaayikkuka)",
+            // Level Y
+            "Water": "വെള്ളം (Vellam)", "House": "വീട് (Veed)", "Chair": "കസേര (Kasera)", "Green": "പച്ച (Pacha)",
+            "Happy": "സന്തോഷം (Santhosham)", "Sleep": "ഉറങ്ങുക (Uranguka)", "Drink": "കുടിക്കുക (Kudikkuka)", "Write": "എഴുതുക (Ezhuthuka)",
+            "Clean": "വൃത്തിയാക്കുക (Vrithiyaakkuka)", "Family": "കുടുംബം (Kudumbam)", "Friend": "കൂട്ടുകാരൻ (Koottukaaran)", "School": "സ്കൂൾ (School)",
+            "Mother": "അമ്മ (Amma)", "Father": "അച്ഛൻ (Achan)", "Morning": "രാവിലെ (Raavile)", "Night": "രാത്രി (Raathri)",
+            "Smile": "പുഞ്ചിരി (Punchiri)", "Angry": "ദേഷ്യം (Deshyam)", "Small": "ചെറുത് (Cheruthu)", "Large": "വലുത് (Valuthu)",
+            // Level X
+            "Beautiful": "ഭംഗിയുള്ള (Bhangiyulla)", "Kitchen": "അടുക്കള (Adukkala)", "Clothes": "വസ്ത്രങ്ങൾ (Vasthrangal)", "Teacher": "അധ്യാപകൻ / അധ്യാപിക (Adhyaapakan / Adhyaapika)",
+            "Evening": "വൈകുന്നേരം (Vaikunneram)", "Picture": "ചിത്രം (Chithram)", "Listen": "ശ്രദ്ധിച്ചു കേൾക്കുക (Shraddhichu Kelkkuka)", "Speak": "സംസാരിക്കുക (Samsaariakkuka)",
+            "Choose": "തിരഞ്ഞെടുക്കുക (Thiranjedukkuka)", "Forget": "മറക്കുക (Marakkuka)", "Remember": "ഓർക്കുക (Orkkuka)", "Always": "എപ്പോഴും (Eppozhum)",
+            "Because": "കാരണം (Kaaranam)", "Welcome": "സ്വാഗതം (Swaagatham)", "Market": "ചന്ത / മാർക്കറ്റ് (Chantha / Market)", "Journey": "യാത്ര (Yaathra)",
+            "Weather": "കാലാവസ്ഥ (Kaalaavastha)", "Inside": "ഉള്ളിൽ (Ullil)", "Outside": "പുറത്ത് (Purathu)",
+            // Level W
+            "Shadow": "നിഴൽ (Nizhal)", "Window": "ജനൽ (Janal)", "Bridge": "പാലം (Paalam)", "Forest": "കാട് (Kaadu)",
+            "Valley": "താഴ്‌വര (Thaazhvara)", "Winter": "ശീതകാലം (Sheethakaalam)", "Summer": "വേനൽക്കാലം (Venalkkaalam)", "Spring": "വസന്തകാലം (Vasanthakaalam)",
+            "Autumn": "ശരത്കാലം (Sharathkaalam)", "Flower": "പൂവ് (Poovu)", "Yellow": "മഞ്ഞ (Manja)", "Orange": "ഓറഞ്ച് (Orange)",
+            "Purple": "പർപ്പിൾ / വയലറ്റ് (Purple / Violet)", "Silver": "വെള്ളി (Velli)", "Golden": "സ്വർണ്ണനിറമുള്ള (Swarnna Niramulla)", "Monkey": "കുരങ്ങൻ (Kurangan)",
+            "Rabbit": "മുയൽ (Muyal)", "Kitten": "പൂച്ചക്കുട്ടി (Poochakkutty)", "Turtle": "ആമ (Aama)", "Spider": "ചിലന്തി (Chilanthi)",
+            // Level V
+            "Animal": "മൃഗം (Mrigam)", "Bottle": "കുപ്പി (Kuppi)", "Camera": "ക്യാമറ (Camera)", "Guitar": "ഗിറ്റാർ (Guitar)",
+            "Hammer": "ചുറ്റിക (Chuttika)", "Pencil": "പെൻസിൽ (Pencil)", "Doctor": "ഡോക്ടർ (Doctor)", "Farmer": "കർഷകൻ (Karshakan)",
+            "Driver": "ഡ്രൈവർ (Driver)", "Artist": "കലാകാരൻ (Kalaakaaran)", "Singer": "ഗായകൻ / ഗായിക (Gaayakan / Gaayika)", "Player": "കളിക്കാരൻ (Kalikkaaran)",
+            "Sister": "സഹോദരി (Sahodhari)", "Brother": "സഹോദരൻ (Sahodharan)", "Street": "തെരുവ് (Theruvu)", "Garden": "തോട്ടം (Thottam)",
+            "Corner": "മൂല (Moola)", "Island": "ദ്വീപ് (Dweepu)"
+        };
+
+        // Helper function to safely get Malayalam meanings with dynamic Manglish fallback
+        function getMalayalamMeaning(word) {
+            if (malayalamMeanings[word]) {
+                return malayalamMeanings[word];
+            }
+            // Auto Manglish / Malayalam dictionary simulation for advanced levels
+            return `${word} - മലയാളം വിവരണം ആവശ്യമുണ്ട് (Malayalam meaning required)`;
+        }
+
+        const funnyLabels = {
+            'Z': { name: 'Silly Potato Stage', threshold: 45, emoji: '🥔' },
+            'Y': { name: 'Flying Monkey Stage', threshold: 45, emoji: '🐵' },
+            'X': { name: 'Spaghetti Noodle Stage', threshold: 45, emoji: '🍝' },
+            'W': { name: 'Wobbly Weather Stage', threshold: 45, emoji: '🌤️' },
+            'V': { name: 'Vicious Volcano Stage', threshold: 45, emoji: '🌋' },
+            'U': { name: 'Underwear Umbrella Stage', threshold: 45, emoji: '☔' },
+            'T': { name: 'Ticklish Tiger Stage', threshold: 50, emoji: '🐯' },
+            'S': { name: 'Slurping Soup Stage', threshold: 50, emoji: '🍜' },
+            'R': { name: 'Rowdy Robot Stage', threshold: 50, emoji: '🤖' },
+            'Q': { name: 'Quiet Queen Stage', threshold: 50, emoji: '👑' },
+            'P': { name: 'Prankster Penguin Stage', threshold: 50, emoji: '🐧' },
+            'O': { name: 'Outrageous Onion Stage', threshold: 50, emoji: '🧅' },
+            'N': { name: 'Noisy Noodle Stage', threshold: 55, emoji: '🥢' },
+            'M': { name: 'Mad Monkey Stage', threshold: 55, emoji: '🐒' },
+            'L': { name: 'Lazy Lizard Stage', threshold: 55, emoji: '🦎' },
+            'K': { name: 'Krazy Kitten Stage', threshold: 55, emoji: '🐱' },
+            'J': { name: 'Jumpy Jellyfish Stage', threshold: 60, emoji: '🪼' },
+            'I': { name: 'Itchy Iguana Stage', threshold: 60, emoji: '🦎' },
+            'H': { name: 'Happy Hippo Stage', threshold: 60, emoji: '🦛' },
+            'G': { name: 'Giggling Ghost Stage', threshold: 65, emoji: '👻' },
+            'F': { name: 'Funny Flamingo Stage', threshold: 65, emoji: '🦩' },
+            'E': { name: 'Energetic Elephant Stage', threshold: 70, emoji: '🐘' },
+            'D': { name: 'Dizzy Dinosaur Stage', threshold: 70, emoji: '🦖' },
+            'C': { name: 'Clever Cabbage Stage', threshold: 75, emoji: '🥬' },
+            'B': { name: 'Bouncing Banana Stage', threshold: 75, emoji: '🍌' },
+            'A': { name: 'Awesome Astronaut Stage', threshold: 80, emoji: '🚀' }
+        };
+
+        const curriculum = {};
+
+        // Generate complete distinct test instructions dynamically for all 26 letters
+        alphabetArr.forEach((lvl, stepIdx) => {
+            const wordsList = rawThematicWords[lvl] || rawThematicWords['Z']; // Safe fallback
+            const meta = funnyLabels[lvl];
+            
+            curriculum[lvl] = {
+                name: meta.name,
+                threshold: meta.threshold,
+                emoji: meta.emoji,
+                words: wordsList,
+                test0: {
+                    title: `Study Session (${lvl}): Read & Listen`,
+                    desc: `Read this funny story carrying all 20 Level vocabulary words together. Tap each highlighted word to read aloud and see the Malayalam translation!`
+                },
+                test1: {
+                    title: `Test 1: Hear & Spell (${lvl})`,
+                    desc: `Spelling Challenge! Dictate these progressive words to your student. Mark correct or failed.`,
+                    answers: wordsList.map((w, idx) => `#${idx+1}: ${w}`)
+                },
+                test2: {
+                    title: `Test 2: Malayalam Meaning Quiz (${lvl})`,
+                    desc: `Meaning Challenge! Ask the student to explain the vocabulary word in Malayalam (their mother tongue).`,
+                    answers: wordsList.map(w => `${w} ➔ ${getMalayalamMeaning(w)}`)
+                },
+                test3: {
+                    title: `Test 3: Speak & Speed (${lvl})`,
+                    desc: `Quick spelling round! Start the timer and make the student spell the target word backwards or instantly out loud.`,
+                    answers: wordsList.map(w => `${w} -> ${w.split('').reverse().join('-').toUpperCase()}`)
+                }
+            };
+        });
+
+        // Dynamic funny impositions depending on the failed word and test stage
+        function generateFunnyImposition(word, stage) {
+            const seedInt = word.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+            
+            const impositionsStage1 = [
+                `Balance a book on your nose and sing the letters of "${word}" like a grand opera star!`,
+                `Spell "${word}" backward while tickling your ribs and giggling like a hyena!`,
+                `Write "${word}" in giant letters on the floor using only your big toe!`,
+                `Close your eyes and spell "${word}" while making loud pig-snorting noises between every letter!`,
+                `Say "${word}" 5 times very fast while holding your ears and blinking like an owl!`
+            ];
+
+            const impositionsStage2 = [
+                `Explain what "${word}" means in Malayalam without speaking! Perform a crazy silent mime dance!`,
+                `Make up a sentence using the Malayalam meaning of "${word}" and the word "Soggy Marshmallow" in a wizard voice!`,
+                `Scream the definition of "${word}" under your desk to an imaginary dinosaur!`,
+                `Explain "${word}" using only caveman speech (e.g., "Me like ${word} because warm...")!`,
+                `Do your best monkey dance while explaining why the world needs "${word}"!`
+            ];
+
+            const impositionsStage3 = [
+                `Do 3 wacky frog jumps while shouting the backwards spelling of "${word}"!`,
+                `Gently hold your tongue with your finger and try to spell "${word}" out loud!`,
+                `Clap your hands and spin in a circle twice, then spell "${word}" with robot movements!`,
+                `Make funny dolphin click-noises between every single letter of "${word}"!`,
+                `Wiggle your head back and forth like a wobbly jellyfish while spelling "${word}" backward!`
+            ];
+
+            if (stage === 1) return impositionsStage1[seedInt % impositionsStage1.length];
+            if (stage === 2) return impositionsStage2[seedInt % impositionsStage2.length];
+            return impositionsStage3[seedInt % impositionsStage3.length];
+        }
+    </script>
+
+    <!-- REALTIME DATABASE & APP ENGINE -->
+    <script>
+        let selectedAvatar = '🥔';
+        let currentStudentId = null;
+        let activeLevel = 'Z';
+        let activeTestStage = 0; // Starts at 0 (Study Story Stage)
+        let activeStudentData = null;
+        let visibleMeanings = {}; // Map of wordIndex -> boolean to track meaning reveal states
+        
+        let gradingMatrix = {};
+        alphabetArr.forEach(lvl => {
+            gradingMatrix[lvl] = { 1: {}, 2: {}, 3: {} };
+        });
+
+        // Offline Sandbox Fallback dataset
+        let localInMemoryStudents = [
+            {
+                id: 'shezna',
+                name: 'Shezna',
+                avatar: '🦄',
+                level: 'Z',
+                matrix: JSON.stringify(gradingMatrix)
+            },
+            {
+                id: 'super-potato',
+                name: 'SuperPotato',
+                avatar: '🥔',
+                level: 'Z',
+                matrix: JSON.stringify(gradingMatrix)
+            }
+        ];
+
+        function selectAvatar(emoji) {
+            playSound('pop');
+            selectedAvatar = emoji;
+            document.querySelectorAll('.avatar-option').forEach(btn => {
+                btn.classList.remove('border-amber-500', 'bg-white');
+                if (btn.innerText === emoji) {
+                    btn.classList.add('border-amber-500', 'bg-white');
+                }
+            });
+        }
+
+        // Initialize state tracking listeners
+        window.addEventListener('load', () => {
+            const checkFirebaseTimer = setInterval(() => {
+                if (window.useLocalFallback) {
+                    clearInterval(checkFirebaseTimer);
+                    activateOfflineMode();
+                } else if (window.db && window.auth) {
+                    clearInterval(checkFirebaseTimer);
+                    startRealtimeSync();
+                }
+            }, 100);
+        });
+
+        function activateOfflineMode() {
+            document.getElementById('offline-banner').classList.remove('hidden');
+            renderStudentListUI(localInMemoryStudents);
+        }
+
+        function renderStudentListUI(studentsArray) {
+            const listContainer = document.getElementById('students-list');
+            listContainer.innerHTML = '';
+            
+            const leaderboardContainer = document.getElementById('academy-leaderboard');
+            leaderboardContainer.innerHTML = '';
+
+            if (!studentsArray || studentsArray.length === 0) {
+                listContainer.innerHTML = `<div class="text-xs text-center text-slate-400 py-4">No student profiles found. Create one below!</div>`;
+                return;
+            }
+
+            studentsArray.forEach(student => {
+                const row = document.createElement('button');
+                row.type = 'button';
+                row.onclick = () => loginStudent(student.id, student);
+                row.className = "flex items-center justify-between w-full p-2 bg-white hover:bg-amber-100 rounded-xl transition border border-amber-100 font-bold text-sm text-left shadow-sm";
+                row.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <span class="text-xl">${student.avatar || '🥔'}</span>
+                        <span>${student.name}</span>
+                    </div>
+                    <span class="text-xs bg-amber-200 text-amber-800 px-2 py-0.5 rounded-full uppercase font-black">Level ${student.level || 'Z'}</span>
+                `;
+                listContainer.appendChild(row);
+
+                const leaderPill = document.createElement('div');
+                leaderPill.className = "bg-amber-600 text-white px-3 py-1 rounded-full flex items-center gap-1.5 font-bold shadow border border-amber-400";
+                leaderPill.innerHTML = `
+                    <span>${student.avatar}</span>
+                    <span>${student.name}</span>
+                    <span class="bg-amber-800 text-amber-300 px-1.5 py-0.2 rounded-full text-[10px] font-black">${student.level || 'Z'}</span>
+                `;
+                leaderboardContainer.appendChild(leaderPill);
+            });
+        }
+
+        async function startRealtimeSync() {
+            try {
+                await signInAnonymously(auth);
+                console.log("Authenticated anonymously to Firestore.");
+                
+                const studentsColl = collection(db, 'artifacts', appId, 'public', 'data', 'students');
+                
+                onSnapshot(studentsColl, (snapshot) => {
+                    const onlineStudents = [];
+                    snapshot.forEach(doc => {
+                        onlineStudents.push({
+                            id: doc.id,
+                            ...doc.data()
+                        });
+                    });
+                    renderStudentListUI(onlineStudents);
+                }, (error) => {
+                    console.error("Firestore listening failed, forcing fallback:", error);
+                    activateOfflineMode();
+                });
+
+            } catch (e) {
+                console.error("Realtime auth sync failed, fallback triggered:", e);
+                activateOfflineMode();
+            }
+        }
+
+        // CREATE OR REGISTER NEW STUDENT
+        async function createAndLoginStudent() {
+            playSound('pop');
+            const nameInput = document.getElementById('new-student-name').value.trim();
+            if (!nameInput) {
+                showCustomModal('Oops!', 'Please enter a funny name to start!', '🤪');
+                return;
+            }
+
+            const cleanId = nameInput.toLowerCase().replace(/[^a-z0-9]/g, '-');
+
+            const baseProgress = {};
+            alphabetArr.forEach(lvl => {
+                baseProgress[lvl] = { 1: {}, 2: {}, 3: {} };
+            });
+
+            const defaultPayload = {
+                id: cleanId,
+                name: nameInput,
+                avatar: selectedAvatar,
+                level: 'Z',
+                matrix: JSON.stringify(baseProgress)
+            };
+
+            if (window.useLocalFallback) {
+                const exists = localInMemoryStudents.find(s => s.id === cleanId);
+                if (!exists) {
+                    localInMemoryStudents.push(defaultPayload);
+                }
+                renderStudentListUI(localInMemoryStudents);
+                loginStudent(cleanId, defaultPayload);
+            } else {
+                try {
+                    const studentDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'students', cleanId);
+                    await setDoc(studentDocRef, defaultPayload);
+                    loginStudent(cleanId, defaultPayload);
+                } catch (e) {
+                    console.warn("Failed to write to remote Firestore database, creating locally:", e);
+                    window.useLocalFallback = true;
+                    activateOfflineMode();
+                    localInMemoryStudents.push(defaultPayload);
+                    renderStudentListUI(localInMemoryStudents);
+                    loginStudent(cleanId, defaultPayload);
+                }
+            }
+        }
+
+        // LOGIN ACTIVE STUDENT
+        function loginStudent(sId, data) {
+            playSound('success');
+            currentStudentId = sId;
+            activeStudentData = data;
+            activeLevel = data.level || 'Z';
+            visibleMeanings = {}; // Reset meaning visibility toggles
+            
+            try {
+                gradingMatrix = JSON.parse(data.matrix);
+            } catch (err) {
+                gradingMatrix = {};
+                alphabetArr.forEach(lvl => {
+                    gradingMatrix[lvl] = { 1: {}, 2: {}, 3: {} };
+                });
+            }
+
+            document.getElementById('student-name-display').innerText = data.name;
+            document.getElementById('student-avatar-display').innerText = data.avatar || '🥔';
+            
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('profile-indicator').classList.remove('hidden');
+            document.getElementById('academy-workspace').classList.remove('hidden');
+
+            renderLevelMap();
+            switchLevel(activeLevel);
+        }
+
+        function logoutStudent() {
+            playSound('click');
+            currentStudentId = null;
+            activeStudentData = null;
+            document.getElementById('login-screen').classList.remove('hidden');
+            document.getElementById('profile-indicator').classList.add('hidden');
+            document.getElementById('academy-workspace').classList.add('hidden');
+        }
+
+        // GENERATE MAP ROADNODES (Z to A)
+        function renderLevelMap() {
+            const roadmap = document.getElementById('roadmap-nodes');
+            roadmap.innerHTML = '';
+
+            const unlockedList = getUnlockedLevels();
+
+            alphabetArr.forEach(lvl => {
+                const isUnlocked = unlockedList.includes(lvl);
+                const isActive = (lvl === activeLevel);
+                const item = document.createElement('button');
+                item.type = 'button';
+                item.onclick = () => isUnlocked ? switchLevel(lvl) : showCustomModal('Silly Level Locked!', `Complete previous levels up to standard to unlock Level ${lvl}!`, '🔒');
+                
+                item.className = `flex-shrink-0 flex flex-col items-center justify-center p-3 w-24 rounded-xl border-2 transition bouncy-card ${
+                    isActive ? 'border-amber-500 bg-amber-200 text-amber-900 font-extrabold' : 
+                    isUnlocked ? 'border-amber-300 bg-white text-slate-700' : 'border-slate-200 bg-slate-100 text-slate-400 opacity-60'
+                }`;
+
+                item.innerHTML = `
+                    <span class="text-2xl">${isUnlocked ? curriculum[lvl].emoji : '🔒'}</span>
+                    <span class="text-xs font-black uppercase mt-1">Level ${lvl}</span>
+                    <span class="text-[9px] text-slate-500">${curriculum[lvl].threshold}% pass</span>
+                `;
+                roadmap.appendChild(item);
+            });
+        }
+
+        function getUnlockedLevels() {
+            let unlocked = ['Z'];
+            for (let i = 0; i < alphabetArr.length - 1; i++) {
+                const currentLvl = alphabetArr[i];
+                const nextLvl = alphabetArr[i + 1];
+                if (verifyPassingGrade(currentLvl)) {
+                    unlocked.push(nextLvl);
+                } else {
+                    break;
+                }
+            }
+            return unlocked;
+        }
+
+        function verifyPassingGrade(lvl) {
+            const wordsList = curriculum[lvl].words;
+            let earned = 0;
+            const total = wordsList.length * 3;
+
+            [1, 2, 3].forEach(stage => {
+                wordsList.forEach((_, wIdx) => {
+                    if (gradingMatrix[lvl] && gradingMatrix[lvl][stage] && gradingMatrix[lvl][stage][wIdx] === 1) {
+                        earned++;
+                    }
+                });
+            });
+
+            const percent = Math.round((earned / total) * 100);
+            return percent >= curriculum[lvl].threshold;
+        }
+
+        function switchLevel(lvlLetter) {
+            activeLevel = lvlLetter;
+            visibleMeanings = {}; // Clear toggles on level switch
+            document.getElementById('level-unlock-status').innerText = `Section ${lvlLetter} - ${curriculum[lvlLetter].name}`;
+            
+            renderLevelMap();
+            switchTestStage(0); // Default to Study Story on swap
+        }
+
+        // Dynamic dynamic funny story generator for study intro
+        function generateFunnyStudyStory(lvl) {
+            const words = curriculum[lvl].words;
+            const studentName = activeStudentData ? activeStudentData.name : 'SuperNoodle';
+            
+            // Funny mad-lib storyteller templates containing words
+            const storyTemplates = [
+                `Once upon a time in a silly land, ${studentName} decided to take a friendly pet {0} and a majestic {1} to catch the glorious morning {2}! However, they forgot their cozy {3} and a shiny drinking {4}! Instead of reading an academic {5}, they went searching for a flying {6} near a giant magical {7}. Along the way, they drank cold {8} and waved their left {9} while jumping with their right {10} outside the giant front {11}. "Gimme delicious {12}!" shouted ${studentName}. "We must find our way {13}!" So they decided to {14} carefully, {15} super fast, {16} high in the air, {17} silly games, and suddenly {18} to {19} a lost potato wizard!`,
+                
+                `Attention vocabulary troopers! ${studentName} went on a mission where the {0} was falling from a wooden {1} onto a squeaky {2}. Suddenly, a {3} monster appeared making everyone {4}! To help everyone {5}, ${studentName} offered them a cool {6} and began to {7} a letter to a friend to help {8} the messy room. The entire {9} and their best {10} went to the magical academy {11} to visit their beloved {12} and {13} in the sunny {14}. As the starry {15} arrived, they saw a giant {16} and got {17} because of {18} pebbles and {19} marshmallows!`,
+                
+                `Once there was an adventure so {0} that even the {1} had to wear funny {2}! The grand {3} woke up in the {4} and {5} to look at a pretty {6}. "Please {7} to me!" they said as they tried to {8} a path and {9} their worries to {10} their vocabulary! ${studentName} was {11} happy, {12} they discovered a {13} near a busy {14} during a magical {15} of the weather {16}. Looking {17} and {18}, they found a secret cookie {19}!`
+            ];
+
+            const templateIndex = alphabetArr.indexOf(lvl) % storyTemplates.length;
+            let finalStory = storyTemplates[templateIndex];
+
+            // Replace {index} placeholders with clickable, styled word elements
+            words.forEach((w, idx) => {
+                const translation = getMalayalamMeaning(w);
+                const clickableSpan = `<span class="inline-block bg-yellow-100 hover:bg-amber-200 text-amber-900 border-b-4 border-dashed border-amber-500 px-1.5 py-0.5 rounded-lg cursor-pointer font-bold transition transform hover:scale-105 active:scale-95 duration-100 mx-1" onclick="speakWord('${w}'); playSound('click'); showCustomModal('Word Info: ${w}', 'Malayalam: ${translation}', '🗣️');">
+                    ${w}
+                </span>`;
+                finalStory = finalStory.replace(`{${idx}}`, clickableSpan);
+            });
+
+            return finalStory;
+        }
+
+        // TEST STAGE TAB SWAPPING
+        function switchTestStage(stageNum) {
+            activeTestStage = stageNum;
+            
+            const tabs = document.querySelectorAll('.test-tab-btn');
+            tabs.forEach((tab, index) => {
+                if (index === stageNum) {
+                    tab.classList.add('bg-amber-500', 'text-white');
+                    tab.classList.remove('bg-slate-100', 'text-slate-600');
+                } else {
+                    tab.classList.remove('bg-amber-500', 'text-white');
+                    tab.classList.add('bg-slate-100', 'text-slate-600');
+                }
+            });
+
+            const currLevelConfig = curriculum[activeLevel];
+            const testConfig = currLevelConfig[`test${stageNum}`];
+
+            document.getElementById('test-stage-title').innerText = `${testConfig.title}`;
+            document.getElementById('test-stage-desc').innerText = testConfig.desc;
+
+            const studyArea = document.getElementById('study-area-box');
+            const gradingArea = document.getElementById('grading-grid-section');
+            const timerBox = document.getElementById('interactive-utility-box');
+
+            if (stageNum === 0) {
+                // Study Story Mode
+                studyArea.classList.remove('hidden');
+                gradingArea.classList.add('hidden');
+                timerBox.classList.add('hidden');
+                document.getElementById('test-stage-icon').innerText = '📖';
+
+                // Render story content
+                document.getElementById('study-story-content').innerHTML = generateFunnyStudyStory(activeLevel);
+            } else {
+                // Testing Stages
+                studyArea.classList.add('hidden');
+                gradingArea.classList.remove('hidden');
+                
+                if (stageNum === 1) document.getElementById('test-stage-icon').innerText = '📝';
+                if (stageNum === 2) document.getElementById('test-stage-icon').innerText = '🧠';
+                if (stageNum === 3) document.getElementById('test-stage-icon').innerText = '🗣️';
+
+                if (stageNum === 3) {
+                    timerBox.classList.remove('hidden');
+                    setupOralTestTimerMode();
+                } else {
+                    timerBox.classList.add('hidden');
+                }
+
+                renderGradingWords();
+                renderCheatSheetList();
+            }
+
+            clearInterval(countdownInterval);
+            document.getElementById('timer-display').innerText = '-';
+        }
+
+        function setupOralTestTimerMode() {
+            const timerBox = document.getElementById('interactive-utility-box');
+            timerBox.classList.remove('hidden');
+            let timerSpeed = 5;
+            const lettersIndex = alphabetArr.indexOf(activeLevel);
+            
+            if (lettersIndex > 18) { 
+                timerSpeed = 6;
+                document.getElementById('timer-title-box').innerText = "Wacky Friendly Timer ⏱️";
+                document.getElementById('timer-sub-box').innerText = "Take your time! 6 seconds per word.";
+            } else if (lettersIndex > 10) { 
+                timerSpeed = 4;
+                document.getElementById('timer-title-box').innerText = "Standard Oral Timer ⏱️";
+                document.getElementById('timer-sub-box').innerText = "Stay alert! 4 seconds per word.";
+            } else { 
+                timerSpeed = 3;
+                document.getElementById('timer-title-box').innerText = "💥 RAPID SPELLING BEE LASER BLASTER TIMER!";
+                document.getElementById('timer-sub-box').innerText = "Pro levels! Only 3 seconds per spelling word!";
+            }
+            
+            document.getElementById('timer-display').innerText = `${timerSpeed}s`;
+            document.getElementById('timer-play-btn').onclick = () => triggerWackySpeedTimer(timerSpeed);
+        }
+
+        // Toggle specific Malayalam meaning visibility
+        function toggleWordMeaningVisibility(index) {
+            playSound('pop');
+            visibleMeanings[index] = !visibleMeanings[index];
+            renderGradingWords();
+        }
+
+        // RENDER WORDS GRID FOR THE TEACHER (Enhanced with Malayalam translation hints)
+        function renderGradingWords() {
+            const grid = document.getElementById('word-grading-grid');
+            grid.innerHTML = '';
+
+            const wordsList = curriculum[activeLevel].words;
+
+            wordsList.forEach((word, index) => {
+                const testStageMatrix = gradingMatrix[activeLevel][activeTestStage] || {};
+                const gradeState = testStageMatrix[index] || 0; 
+
+                const isCorrect = (gradeState === 1);
+                const isIncorrect = (gradeState === -1);
+
+                const card = document.createElement('div');
+                
+                let cardClass = "flex flex-col gap-3 p-4 rounded-2xl border-4 transition ";
+                if (isCorrect) {
+                    cardClass += "bg-emerald-50 border-emerald-400 shadow-md";
+                } else if (isIncorrect) {
+                    cardClass += "bg-rose-50 border-rose-400 shadow-md animate-shake";
+                } else {
+                    cardClass += "bg-slate-50 border-slate-200";
+                }
+                card.className = cardClass;
+
+                // Render Meaning Stage Helper Option
+                let malayalamSnippet = '';
+                if (activeTestStage === 2) {
+                    const showHint = visibleMeanings[index] || false;
+                    malayalamSnippet = `
+                        <div class="mt-2 pt-2 border-t border-dashed border-slate-200 flex flex-col gap-1.5">
+                            <button onclick="toggleWordMeaningVisibility(${index})" class="text-left text-xs text-indigo-600 hover:text-indigo-800 font-bold flex items-center gap-1">
+                                <span class="material-icons text-sm">${showHint ? 'visibility_off' : 'visibility'}</span>
+                                ${showHint ? 'Hide Mother Tongue Key' : 'Show Malayalam Meaning'}
+                            </button>
+                            <div class="${showHint ? 'block animate-fade-in' : 'hidden'} text-xs bg-indigo-100 text-indigo-900 p-2 rounded-xl font-bold">
+                                💡 Malayalam: ${getMalayalamMeaning(word)}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                let cardHtml = `
+                    <div class="flex justify-between items-center w-full">
+                        <div class="flex flex-col">
+                            <span class="text-xs font-bold text-slate-400">Word #${index + 1}</span>
+                            <span class="text-base font-extrabold ${isCorrect ? 'text-emerald-700' : isIncorrect ? 'text-rose-700' : 'text-slate-700'}">${word}</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <button onclick="speakWord('${word}'); playSound('click');" class="p-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-slate-600 text-xs transition" title="Speak Aloud">
+                                <span class="material-icons text-sm block">volume_up</span>
+                            </button>
+                            <button onclick="setWordGradeState(${index}, 1)" class="p-2 font-black rounded-xl text-xs transition shadow-sm ${
+                                isCorrect ? 'bg-emerald-500 text-white' : 'bg-white hover:bg-emerald-100 border border-emerald-300 text-emerald-600'
+                            }" title="Mark Correct">
+                                <span class="material-icons text-sm block">check_circle</span>
+                            </button>
+                            <button onclick="setWordGradeState(${index}, -1)" class="p-2 font-black rounded-xl text-xs transition shadow-sm ${
+                                isIncorrect ? 'bg-rose-500 text-white' : 'bg-white hover:bg-rose-100 border border-rose-300 text-rose-600'
+                            }" title="Mark Incorrect & Assign Imposition">
+                                <span class="material-icons text-sm block">cancel</span>
+                            </button>
+                        </div>
+                    </div>
+                    ${malayalamSnippet}
+                `;
+
+                if (isIncorrect) {
+                    const sillyImposition = generateFunnyImposition(word, activeTestStage);
+                    cardHtml += `
+                        <div class="bg-rose-100 border-2 border-dashed border-rose-300 text-rose-900 rounded-xl p-2.5 mt-1 text-xs font-semibold leading-relaxed relative flex flex-col gap-1">
+                            <div class="flex items-center gap-1 text-[10px] uppercase font-black text-rose-700 tracking-wider">
+                                <span class="material-icons text-xs leading-none">report_problem</span> Silly Overcome Task:
+                            </div>
+                            <div>${sillyImposition}</div>
+                        </div>
+                    `;
+                }
+
+                card.innerHTML = cardHtml;
+                grid.appendChild(card);
+            });
+
+            recalculateActiveScores();
+        }
+
+        function setWordGradeState(wordIdx, newState) {
+            const matrixTarget = gradingMatrix[activeLevel][activeTestStage] || {};
+            const oldState = matrixTarget[wordIdx] || 0;
+
+            if (oldState === newState) {
+                matrixTarget[wordIdx] = 0;
+                playSound('click');
+            } else {
+                matrixTarget[wordIdx] = newState;
+                if (newState === 1) {
+                    playSound('success');
+                } else {
+                    playSound('fail');
+                }
+            }
+
+            gradingMatrix[activeLevel][activeTestStage] = matrixTarget;
+            renderGradingWords();
+        }
+
+        // PROGRESSION CALCULATIONS
+        function recalculateActiveScores() {
+            const wordsList = curriculum[activeLevel].words;
+            
+            let stageScore = 0;
+            const currentStageMatrix = gradingMatrix[activeLevel][activeTestStage] || {};
+            wordsList.forEach((_, idx) => {
+                if (currentStageMatrix[idx] === 1) stageScore++;
+            });
+            document.getElementById('test-fraction-label').innerText = `${stageScore} / ${wordsList.length} Passed`;
+
+            let totalEarned = 0;
+            const totalPossible = wordsList.length * 3;
+
+            [1, 2, 3].forEach(stage => {
+                wordsList.forEach((_, wIdx) => {
+                    if (gradingMatrix[activeLevel] && gradingMatrix[activeLevel][stage] && gradingMatrix[activeLevel][stage][wIdx] === 1) {
+                        totalEarned++;
+                    }
+                });
+            });
+
+            const rawPercent = Math.round((totalEarned / totalPossible) * 100);
+            const reqPercent = curriculum[activeLevel].threshold;
+            
+            const percentageLabel = document.getElementById('level-percentage-label');
+            percentageLabel.innerText = `Total Score: ${rawPercent}% (Need ${reqPercent}%)`;
+
+            const statusTag = document.getElementById('level-status-tag');
+            const levelUpBtn = document.getElementById('level-up-btn');
+
+            if (rawPercent >= reqPercent) {
+                statusTag.innerHTML = `<span class="material-icons">check_circle</span> Target Beaten!`;
+                statusTag.className = "text-lg font-black text-emerald-500 flex items-center gap-1 mt-1 justify-end";
+                levelUpBtn.disabled = false;
+                levelUpBtn.className = "bg-emerald-500 hover:bg-emerald-600 text-white py-4 rounded-2xl font-black shadow-lg shadow-emerald-500/20 transition flex items-center justify-center gap-2 cursor-pointer";
+            } else {
+                statusTag.innerHTML = `<span class="material-icons">cancel</span> Not Met`;
+                statusTag.className = "text-lg font-black text-rose-500 flex items-center gap-1 mt-1 justify-end";
+                levelUpBtn.disabled = true;
+                levelUpBtn.className = "bg-slate-300 text-slate-500 py-4 rounded-2xl font-black cursor-not-allowed transition flex items-center justify-center gap-2";
+            }
+
+            const smartNextBtn = document.getElementById('smart-next-btn');
+            const smartNextText = document.getElementById('smart-next-text');
+            const smartNextIcon = document.getElementById('smart-next-icon');
+
+            if (activeTestStage === 0) {
+                smartNextText.innerText = "Begin Test 1: (Hear & Spell Dictation) 📝";
+                smartNextIcon.innerText = "assignment";
+                smartNextBtn.className = "w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white py-4 px-6 rounded-2xl font-black text-lg shadow-xl shadow-amber-500/10 transition-all duration-300 flex items-center justify-center gap-2 transform active:scale-95 cursor-pointer";
+            } else if (activeTestStage === 1) {
+                smartNextText.innerText = "Next: Test 2 (Malayalam Meaning Quiz) 🧠";
+                smartNextIcon.innerText = "psychology";
+                smartNextBtn.className = "w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white py-4 px-6 rounded-2xl font-black text-lg shadow-xl shadow-indigo-500/10 transition-all duration-300 flex items-center justify-center gap-2 transform active:scale-95 cursor-pointer";
+            } else if (activeTestStage === 2) {
+                smartNextText.innerText = "Next: Test 3 (Oral Spelling Speed-Round) 🗣️";
+                smartNextIcon.innerText = "record_voice_over";
+                smartNextBtn.className = "w-full bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white py-4 px-6 rounded-2xl font-black text-lg shadow-xl shadow-rose-500/10 transition-all duration-300 flex items-center justify-center gap-2 transform active:scale-95 cursor-pointer";
+            } else if (activeTestStage === 3) {
+                if (rawPercent >= reqPercent) {
+                    smartNextText.innerText = "Congratulations! Unlock Next Level 🚀";
+                    smartNextIcon.innerText = "celebration";
+                    smartNextBtn.className = "w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white py-4 px-6 rounded-2xl font-black text-lg shadow-xl shadow-emerald-500/20 animate-bounce transition-all duration-300 flex items-center justify-center gap-2 transform active:scale-95 cursor-pointer";
+                } else {
+                    smartNextText.innerText = "Save Current Score & Challenge Student 📝";
+                    smartNextIcon.innerText = "save";
+                    smartNextBtn.className = "w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white py-4 px-6 rounded-2xl font-black text-lg shadow-xl shadow-amber-500/10 transition-all duration-300 flex items-center justify-center gap-2 transform active:scale-95 cursor-pointer";
+                }
+            }
+
+            updateSillySkillsDashboard();
+            updateCertificatesData();
+        }
+
+        // Smart navigation handler
+        function handleSmartNextStep() {
+            playSound('click');
+            if (activeTestStage === 0) {
+                switchTestStage(1);
+                window.scrollTo({ top: document.getElementById('profile-indicator').offsetTop, behavior: 'smooth' });
+            } else if (activeTestStage === 1) {
+                switchTestStage(2);
+                window.scrollTo({ top: document.getElementById('profile-indicator').offsetTop, behavior: 'smooth' });
+            } else if (activeTestStage === 2) {
+                switchTestStage(3);
+                window.scrollTo({ top: document.getElementById('profile-indicator').offsetTop, behavior: 'smooth' });
+            } else if (activeTestStage === 3) {
+                const wordsList = curriculum[activeLevel].words;
+                const totalPossible = wordsList.length * 3;
+                let totalEarned = 0;
+
+                [1, 2, 3].forEach(stage => {
+                    wordsList.forEach((_, wIdx) => {
+                        if (gradingMatrix[activeLevel][stage] && gradingMatrix[activeLevel][stage][wIdx] === 1) {
+                            totalEarned++;
+                        }
+                    });
+                });
+
+                const rawPercent = Math.round((totalEarned / totalPossible) * 100);
+                const reqPercent = curriculum[activeLevel].threshold;
+
+                if (rawPercent >= reqPercent) {
+                    triggerLevelUnlockAttempt();
+                } else {
+                    saveTestProgressToDb();
+                }
+            }
+        }
+
+        // Live calculation of Student Skill Board attributes
+        function updateSillySkillsDashboard() {
+            let dCount = 0, mCount = 0, oCount = 0;
+            let dMax = 0, mMax = 0, oMax = 0;
+
+            alphabetArr.forEach(lvl => {
+                const wordsList = curriculum[lvl].words;
+                dMax += wordsList.length;
+                mMax += wordsList.length;
+                oMax += wordsList.length;
+
+                wordsList.forEach((_, wIdx) => {
+                    if (gradingMatrix[lvl]) {
+                        if (gradingMatrix[lvl][1] && gradingMatrix[lvl][1][wIdx] === 1) dCount++;
+                        if (gradingMatrix[lvl][2] && gradingMatrix[lvl][2][wIdx] === 1) mCount++;
+                        if (gradingMatrix[lvl][3] && gradingMatrix[lvl][3][wIdx] === 1) oCount++;
+                    }
+                });
+            });
+
+            const dPercent = dMax > 0 ? Math.round((dCount / dMax) * 100) : 0;
+            const mPercent = mMax > 0 ? Math.round((mCount / mMax) * 100) : 0;
+            const oPercent = oMax > 0 ? Math.round((oCount / oMax) * 100) : 0;
+
+            document.getElementById('skill-dictation-percent').innerText = `${dPercent}%`;
+            document.getElementById('skill-dictation-bar').style.width = `${dPercent}%`;
+            document.getElementById('skill-dictation-title').innerText = `Scored ${dCount}/${dMax} correct spellings.`;
+
+            document.getElementById('skill-meaning-percent').innerText = `${mPercent}%`;
+            document.getElementById('skill-meaning-bar').style.width = `${mPercent}%`;
+            document.getElementById('skill-meaning-title').innerText = `Scored ${mCount}/${mMax} semantic meanings.`;
+
+            document.getElementById('skill-oral-percent').innerText = `${oPercent}%`;
+            document.getElementById('skill-oral-bar').style.width = `${oPercent}%`;
+            document.getElementById('skill-oral-title').innerText = `Scored ${oCount}/${oMax} speed spoken letters.`;
+
+            const overallScoreSum = dPercent + mPercent + oPercent;
+            let rankTitle = "Soggy Potato 🥔";
+            if (overallScoreSum > 250) {
+                rankTitle = "Supreme English Deity 🚀";
+            } else if (overallScoreSum > 180) {
+                rankTitle = "Vocabulary Overlord 👑";
+            } else if (overallScoreSum > 100) {
+                rankTitle = "Spelling Wizard 🧠";
+            } else if (overallScoreSum > 40) {
+                rankTitle = "Giggle Apprentice 🐵";
+            } else if (overallScoreSum > 10) {
+                rankTitle = "Developing Sprout 🌱";
+            }
+
+            document.getElementById('overall-rank-badge').innerText = rankTitle;
+        }
+
+        // Live updating of the interactive printable certificates
+        function updateCertificatesData() {
+            const studentName = activeStudentData ? activeStudentData.name : "Active Student";
+            const studentAvatar = activeStudentData ? activeStudentData.avatar : "🥔";
+            const currentRank = document.getElementById('overall-rank-badge').innerText;
+
+            // Update Certificate of Eligibility
+            document.getElementById('cert-eligibility-name').innerText = studentName;
+            document.getElementById('cert-eligibility-avatar').innerText = studentAvatar;
+            document.getElementById('cert-eligibility-rank').innerText = currentRank;
+
+            const today = new Date();
+            const formatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('cert-eligibility-date').innerText = today.toLocaleDateString("en-US", formatOptions);
+
+            // Update Certificate of Performance
+            document.getElementById('cert-performance-name').innerText = studentName;
+
+            const dPercent = document.getElementById('skill-dictation-percent').innerText;
+            const mPercent = document.getElementById('skill-meaning-percent').innerText;
+            const oPercent = document.getElementById('skill-oral-percent').innerText;
+
+            document.getElementById('cert-skill-dictation-val').innerText = dPercent;
+            document.getElementById('cert-skill-meaning-val').innerText = mPercent;
+            document.getElementById('cert-skill-oral-val').innerText = oPercent;
+
+            document.getElementById('cert-skill-dictation-bar').style.width = dPercent;
+            document.getElementById('cert-skill-meaning-bar').style.width = mPercent;
+            document.getElementById('cert-skill-oral-bar').style.width = oPercent;
+        }
+
+        // CHEATSHEET ANSWER KEY TOGGLE
+        let isCheatSheetVisible = false;
+        function toggleCheatSheet() {
+            playSound('click');
+            const box = document.getElementById('cheat-sheet-box');
+            isCheatSheetVisible = !isCheatSheetVisible;
+            if (isCheatSheetVisible) {
+                box.classList.remove('hidden');
+            } else {
+                box.classList.add('hidden');
+            }
+        }
+
+        function renderCheatSheetList() {
+            const cheatList = document.getElementById('cheat-list');
+            cheatList.innerHTML = '';
+            
+            const wordsList = curriculum[activeLevel].words;
+            wordsList.forEach((word, index) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = "bg-stone-700 p-2 rounded border border-stone-600 flex flex-col gap-0.5 overflow-hidden text-ellipsis text-[11px]";
+                
+                if (activeTestStage === 1) {
+                    itemDiv.innerHTML = `<span class="text-stone-400">#${index+1} Spell:</span> <span class="font-bold text-amber-300">${word}</span>`;
+                } else if (activeTestStage === 2) {
+                    itemDiv.innerHTML = `<span class="text-stone-400">#${index+1} Mean:</span> <span class="font-bold text-emerald-300">${getMalayalamMeaning(word)}</span>`;
+                } else {
+                    const backwards = word.split('').reverse().join('-').toUpperCase();
+                    itemDiv.innerHTML = `<span class="text-stone-400">#${index+1} Back:</span> <span class="font-bold text-rose-300">${backwards}</span>`;
+                }
+                
+                cheatList.appendChild(itemDiv);
+            });
+        }
+
+        // WACKY TIMER UTILITIES
+        let countdownInterval = null;
+        function triggerWackySpeedTimer(seconds) {
+            playSound('pop');
+            clearInterval(countdownInterval);
+            let timerValue = seconds;
+            const display = document.getElementById('timer-display');
+            display.innerText = `${timerValue}s`;
+
+            countdownInterval = setInterval(() => {
+                timerValue--;
+                display.innerText = `${timerValue}s`;
+                if (timerValue <= 0) {
+                    clearInterval(countdownInterval);
+                    display.innerText = "💥 Boom!";
+                    playSound('fail');
+                } else {
+                    playSound('click');
+                }
+            }, 1000);
+        }
+
+        // DATABASE SAVE UTILITIES
+        async function saveTestProgressToDb() {
+            playSound('click');
+            if (!currentStudentId) return;
+
+            const updatedMatrixString = JSON.stringify(gradingMatrix);
+
+            if (window.useLocalFallback) {
+                const matchIdx = localInMemoryStudents.findIndex(s => s.id === currentStudentId);
+                if (matchIdx !== -1) {
+                    localInMemoryStudents[matchIdx].matrix = updatedMatrixString;
+                    localInMemoryStudents[matchIdx].level = activeLevel;
+                }
+                renderStudentListUI(localInMemoryStudents);
+                showCustomModal('💾 Saved Offline', 'Progress saved inside local browser memory sandbox!', '🦖');
+            } else {
+                try {
+                    const studentDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'students', currentStudentId);
+                    await updateDoc(studentDocRef, {
+                        matrix: updatedMatrixString,
+                        level: activeLevel
+                    });
+                    showCustomModal('💾 Progress Saved', 'Vocabulary records synced to classroom server!', '🦖');
+                } catch (e) {
+                    console.error("Firestore database write error, falling back locally:", e);
+                    window.useLocalFallback = true;
+                    activateOfflineMode();
+                    saveTestProgressToDb();
+                }
+            }
+        }
+
+        // LEVEL UP VERIFICATION ACTION
+        async function triggerLevelUnlockAttempt() {
+            playSound('fanfare');
+            const wordsList = curriculum[activeLevel].words;
+            const totalPossible = wordsList.length * 3;
+            let totalEarned = 0;
+
+            [1, 2, 3].forEach(stage => {
+                wordsList.forEach((_, wIdx) => {
+                    if (gradingMatrix[activeLevel] && gradingMatrix[activeLevel][stage] && gradingMatrix[activeLevel][stage][wIdx] === 1) {
+                        totalEarned++;
+                    }
+                });
+            });
+
+            const rawPercent = Math.round((totalEarned / totalPossible) * 100);
+            const reqPercent = curriculum[activeLevel].threshold;
+
+            if (rawPercent < reqPercent) {
+                showCustomModal('Locked!', 'You need a higher level average to unlock the next challenge stage.', '🔒');
+                return;
+            }
+
+            const currentIdx = alphabetArr.indexOf(activeLevel);
+            let finishedAll = false;
+            let nextLevel = activeLevel;
+
+            if (currentIdx < alphabetArr.length - 1) {
+                nextLevel = alphabetArr[currentIdx + 1];
+            } else {
+                finishedAll = true;
+            }
+
+            if (window.useLocalFallback) {
+                const matchIdx = localInMemoryStudents.findIndex(s => s.id === currentStudentId);
+                if (matchIdx !== -1) {
+                    localInMemoryStudents[matchIdx].level = finishedAll ? 'A' : nextLevel;
+                    localInMemoryStudents[matchIdx].matrix = JSON.stringify(gradingMatrix);
+                }
+                renderStudentListUI(localInMemoryStudents);
+                
+                if (finishedAll) {
+                    showCustomModal('🏆 ENGLISH OVERLORD!', 'You successfully beat every level from Z to A! You are officially smarter than a boiled cabbage! 🥦', '🦄');
+                } else {
+                    showCustomModal('🚀 LEVEL UP!', `Awesome job! You unlocked Section ${nextLevel}!`, '🦖');
+                    switchLevel(nextLevel);
+                }
+            } else {
+                try {
+                    const studentDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'students', currentStudentId);
+                    if (finishedAll) {
+                        await updateDoc(studentDocRef, {
+                            matrix: JSON.stringify(gradingMatrix),
+                            level: 'A' 
+                        });
+                        showCustomModal('🏆 ENGLISH OVERLORD!', 'You successfully beat every level from Z to A! You are officially smarter than a boiled cabbage! 🥦', '🦄');
+                    } else {
+                        await updateDoc(studentDocRef, {
+                            matrix: JSON.stringify(gradingMatrix),
+                            level: nextLevel
+                        });
+                        showCustomModal('🚀 LEVEL UP!', `Awesome job! You unlocked Section ${nextLevel}!`, '🦖');
+                        switchLevel(nextLevel);
+                    }
+                } catch (e) {
+                    console.error("Firestore write failure on Level Up, updating offline:", e);
+                    window.useLocalFallback = true;
+                    activateOfflineMode();
+                    triggerLevelUnlockAttempt();
+                }
+            }
+        }
+
+        // CUSTOM MODALS (Zero native Alerts!)
+        function showCustomModal(title, desc, art) {
+            document.getElementById('custom-modal-title').innerText = title;
+            document.getElementById('custom-modal-desc').innerText = desc;
+            document.getElementById('modal-art').innerText = art || '🤪';
+            document.getElementById('modal-container').classList.remove('hidden');
+        }
+
+        function closeCustomModal() {
+            playSound('click');
+            document.getElementById('modal-container').classList.add('hidden');
+        }
+    </script>
+
+</body>
+</html>
